@@ -8,6 +8,7 @@ import { ComparisonResult } from '@/types/comparison';
 import { Database as DatabaseIcon, Github as GithubIcon } from 'lucide-react';
 import { compareConnections } from '@/services/api';
 import { toast } from 'sonner';
+import { ComparisonLoadingOverlay } from '@/components/comparison/ComparisonLoadingOverlay';
 
 // Key para almacenar las conexiones en localStorage
 const STORAGE_KEY = 'db-comparator-connections';
@@ -83,10 +84,14 @@ export default function DatabaseComparisonApp() {
   }, [connections]);
 
   const addConnection = (connection: Connection) => {
+    // Clear results when connections are modified
+    clearResults();
     setConnections((prev) => [...prev, { ...connection, id: crypto.randomUUID() }]);
   };
 
   const removeConnection = (id: string) => {
+    // Clear results when connections are modified
+    clearResults();
     setConnections((prev) => {
       const updated = prev.filter(conn => conn.id !== id);
       // Si no quedan conexiones, borrar del localStorage
@@ -112,8 +117,15 @@ export default function DatabaseComparisonApp() {
     });
   };
 
+  const clearResults = () => {
+    setResults(null);
+    sessionStorage.removeItem(RESULTS_KEY);
+  };
+
   const runComparison = async (sourceId: string, targetIds: string[]) => {
     try {
+      // Clear previous results when starting a new comparison
+      clearResults();
       setIsComparing(true);
       
       const source = connections.find(c => c.id === sourceId);
@@ -122,9 +134,6 @@ export default function DatabaseComparisonApp() {
       if (!source || targets.length === 0) {
         throw new Error("Please select source and target connections");
       }
-      
-      // Mostrar que estamos cargando
-      toast.info("Comparing database structures...");
       
       // Realizar la comparación real - poner un pequeño retraso para asegurar
       // que se vea el proceso de comparación incluso si hay datos mock
@@ -156,6 +165,13 @@ export default function DatabaseComparisonApp() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      {/* Loading overlay */}
+      <ComparisonLoadingOverlay 
+        isVisible={isComparing} 
+        message="Preparing your plan"
+        submessage="Setting up your comparison and analyzing your databases..."
+      />
+      
       <header className="border-b border-border sticky top-0 z-10 bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">

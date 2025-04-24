@@ -9,6 +9,7 @@ interface TargetConnectionSelectorProps {
   selectedIds: string[];
   onChange: (ids: string[]) => void;
   exclude?: string[];
+  disabled?: boolean;
 }
 
 export function TargetConnectionSelector({
@@ -16,6 +17,7 @@ export function TargetConnectionSelector({
   selectedIds,
   onChange,
   exclude = [],
+  disabled = false,
 }: TargetConnectionSelectorProps) {
   // Filter out excluded connections
   const availableConnections = connections.filter(
@@ -23,6 +25,7 @@ export function TargetConnectionSelector({
   );
 
   const toggleConnection = (id: string) => {
+    if (disabled) return;
     if (selectedIds.includes(id)) {
       onChange(selectedIds.filter((selectedId) => selectedId !== id));
     } else {
@@ -31,7 +34,10 @@ export function TargetConnectionSelector({
   };
 
   return (
-    <div className="border rounded-md overflow-hidden">
+    <div className={cn(
+      "border rounded-md overflow-hidden",
+      disabled && "opacity-70 cursor-not-allowed"
+    )}>
       {availableConnections.length === 0 ? (
         <div className="p-4 text-center text-muted-foreground text-sm">
           No connections available
@@ -43,10 +49,11 @@ export function TargetConnectionSelector({
               <div
                 key={connection.id}
                 className={cn(
-                  "flex items-center justify-between p-2 cursor-pointer rounded-sm transition-colors mb-1",
+                  "flex items-center justify-between p-2 rounded-sm transition-colors mb-1",
                   selectedIds.includes(connection.id || '')
                     ? "bg-primary/10 hover:bg-primary/20"
-                    : "hover:bg-muted"
+                    : "hover:bg-muted",
+                  !disabled && "cursor-pointer"
                 )}
                 onClick={() => toggleConnection(connection.id || '')}
               >

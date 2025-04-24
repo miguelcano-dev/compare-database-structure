@@ -12,6 +12,7 @@ interface ConnectionSelectorProps {
   selectedId: string;
   onChange: (id: string) => void;
   exclude?: string[];
+  disabled?: boolean;
 }
 
 export function ConnectionSelector({
@@ -19,6 +20,7 @@ export function ConnectionSelector({
   selectedId,
   onChange,
   exclude = [],
+  disabled = false,
 }: ConnectionSelectorProps) {
   // Filter out excluded connections
   const availableConnections = connections.filter(
@@ -26,7 +28,7 @@ export function ConnectionSelector({
   );
 
   return (
-    <Select value={selectedId} onValueChange={onChange}>
+    <Select value={selectedId} onValueChange={onChange} disabled={disabled}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select a database connection" />
       </SelectTrigger>
