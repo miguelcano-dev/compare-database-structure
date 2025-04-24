@@ -20,7 +20,7 @@ A modern Todo application built with React, TypeScript, and Express. This applic
 1. Clone this repository:
 ```bash
 git clone https://github.com/miguelcano-dev/compare-database-structure.git
-cd todo-app
+cd compare-database-structure
 ```
 
 2. Install dependencies:
